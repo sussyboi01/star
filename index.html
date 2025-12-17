@@ -219,14 +219,35 @@
     container.appendChild(plusBtn);
   }
 
+  // Function to load content into the active iframe
   function loadContent(tab) {
-    const container = document.getElementById('content');
-    container.innerHTML = '';
-    if (tab.url && tab.url !== 'about:blank') {
-      const iframe = document.createElement('iframe');
-      iframe.src = `/s/embed.html#${tab.url}`;
-      container.appendChild(iframe);
-    }
+      const container = document.getElementById('content');
+      container.innerHTML = '';
+      
+      if (tab.url && tab.url !== 'about:blank') {
+          const iframe = document.createElement('iframe');
+          
+          // --- START OF CDN IMPLEMENTATION CHANGE ---
+          
+          // 1. Define the base URL for your CDN-hosted proxy loader HTML.
+          // **!!! REMINDER: Change this URL to your actual JSDelivr path !!!**
+          const cdnBaseUrl = 'https://cdn.jsdelivr.net/gh/sussyboi01/star@latest/s/embed.html'; 
+          
+          // 2. Set the iframe source to the CDN URL, passing the target URL 
+          //    as an encoded hash fragment.
+          iframe.src = `${cdnBaseUrl}#${encodeURIComponent(tab.url)}`;
+          
+          // --- END OF CDN IMPLEMENTATION CHANGE ---
+          
+          container.appendChild(iframe);
+          
+          // Optional: Add a listener to update the tab title after the iframe content loads
+          iframe.onload = () => {
+              // Attempt to get the actual title from the iframe content (may be blocked by CORS/security)
+              // For now, we rely on the URL-based title set in navigateToAddress()
+              console.log(`Content loaded for: ${tab.url}`);
+          };
+      }
   }
 
   function navigateToAddress() {
